@@ -1,0 +1,19 @@
+name: Hello World
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "deploy-gh-page/**"
+      - ".github/workflows/hello-world.yml"
+
+jobs:
+  say-hello:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./deploy-gh-page
+    steps:
+      - name: Say hello
+        run: echo "Hello, world!"
