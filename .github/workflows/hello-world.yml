@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - develop
     paths:
       - "hello-world/**"
       - ".github/workflows/hello-world.yml"
