@@ -1,148 +1,189 @@
-# CICD demo
+# CICD Demo
 
 ## Project Overview
 
-This project demonstrates a minimal Continuous Integration and Continuous Deployment (CI/CD) pipeline using GitHub Actions and GitHub Pages to automatically deploy a static HTML site.
+This repository demonstrates a minimal Continuous Integration and Continuous Deployment (CI/CD) pipeline using GitHub Actions, with three independent subprojects:
+
+- **minimal-test/**: A Node.js project with automated tests.
+- **deploy-gh-page/**: A static site deployed to GitHub Pages.
+- **hello-world/**: A simple directory for workflow demonstration.
+
+Each subproject has its own workflow and can be tested independently.
 
 ---
 
-## Live Demo
+## Project Structure
 
-You can view the deployed project here:
-[https://gastondvoskin.github.io/cicd-demo/](https://gastondvoskin.github.io/cicd-demo/)
+```
+cicd-demo/
+├── minimal-test/         # Node.js project with tests
+├── deploy-gh-page/       # Static site for GitHub Pages
+├── hello-world/          # Simple workflow demo
+└── .github/workflows/    # All workflow YAML files
+```
 
 ---
 
-## Quick Start: Clone and Deploy
+## Basic Structure of a GitHub Actions Workflow YAML
 
-Follow these steps to clone this repository and deploy your own static site using GitHub Actions and GitHub Pages.
-
-### 1. Clone the Repository
-
-```sh
-git clone https://github.com/gastondvoskin/cicd-demo.git
-cd cicd-demo
-```
-
-### 2. (Optional) Edit the HTML File
-
-You can edit `index.html` to customize your page:
-
-### 3. Push Your Changes to GitHub
-
-```sh
-git add .
-git commit -m "Update index.html or other files"
-git push origin main
-```
-
-### 4. GitHub Actions Workflow
-
-The workflow file is already set up at `.github/workflows/deploy-github-page.yml`. On every push to the `main` branch, your site will be automatically deployed to GitHub Pages.
-
-#### Workflow configuration:
+A workflow YAML file defines automated processes for your repository. The most common fields are:
 
 ```yaml
-name: Deploy GitHub Page
+name: Example Workflow # (Optional) The name of the workflow as shown in the Actions tab
 
-on:
-  push:
+on: # The event(s) that trigger the workflow
+  push: # Run on push events
     branches:
-      - main
+      - main # Only run on pushes to the 'main' branch
+  pull_request: # Run on pull request events
 
-permissions:
-  pages: write
-  id-token: write
-
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: "."
-      - name: Deploy to GitHub Pages
-        uses: actions/deploy-pages@v4
+jobs: # A workflow is made up of one or more jobs
+  build: # The job ID (can be any name)
+    runs-on: ubuntu-latest # The type of virtual machine to use
+    steps: # A job contains a sequence of steps
+      - name: Checkout code # Step name (for display)
+        uses: actions/checkout@v4 # Use a prebuilt action from the marketplace
+      - name: Run tests
+        run: npm test # Run a shell command
 ```
 
-### 5. Enable GitHub Pages
-
-1. Go to your repository on GitHub.
-2. Navigate to **Settings > Pages**.
-3. Under **Build and deployment**, select **GitHub Actions** as the source.
-
-### 6. Access Your Deployed Site
-
-After the workflow completes, your site will be available at:
-
-```
-https://<your-username>.github.io/<your-repo>/
-```
-
-For this repository:
-[https://gastondvoskin.github.io/cicd-demo/](https://gastondvoskin.github.io/cicd-demo/)
-
----
-
-## (Optional) Install GitHub Actions Extension for VS Code
-
-- Open VS Code.
-- Go to the Extensions panel (Ctrl+Shift+X or Cmd+Shift+X).
-- Search for "GitHub Actions" and install the official extension.
-- This extension allows you to:
-  - View workflow runs and logs directly in VS Code.
-  - Trigger workflows manually.
-  - Get autocompletion and validation for workflow YAML files.
-
----
-
-## Adding Another GitHub Actions Workflow
-
-You can add as many workflows as you need. To add a new workflow:
-
-1. Create a new YAML file in the `.github/workflows/` directory, for example:
-   ```sh
-   touch .github/workflows/another-workflow.yml
-   ```
-2. Add your workflow configuration to this file. Each workflow runs independently and can be triggered by different events (push, pull request, schedule, etc).
-
----
-
-## What is a Workflow YAML File?
-
-A workflow YAML file defines automated processes for your repository. It consists of several key parts:
-
-- **name:** The name of the workflow (for display in GitHub).
-- **on:** The event(s) that trigger the workflow (e.g., push, pull_request).
-- **jobs:** One or more jobs to run. Each job runs on a virtual machine.
-- **steps:** The sequence of commands or actions to execute in each job.
-- **uses:** Calls a reusable action from the GitHub Marketplace or a public repo.
-- **run:** Runs a shell command directly.
-
-Example structure:
+**Example minimal workflow:**
 
 ```yaml
-name: Example Workflow
-on: [push]
+name: CI
+
+on: [push, pull_request]
+
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
     steps:
-      - name: Example step
-        run: echo "Hello, World!"
+      - uses: actions/checkout@v4
+      - run: echo "Hello, World!"
 ```
 
 ---
 
-## Finding Workflow Templates on GitHub
+## How to Test Each Subproject
 
-- Visit the [GitHub Actions Marketplace](https://github.com/marketplace?type=actions) to find reusable actions and workflow templates.
-- You can also search for "workflow templates" or "actions" in the GitHub Marketplace or directly in the [Actions tab](https://github.com/features/actions) of your repository.
-- When creating a new workflow in GitHub, you can choose from a variety of starter templates for common use cases (Node.js, Python, deployment, etc).
+### 1. **minimal-test/**
+
+- Contains a Node.js project with Jest tests.
+- Workflow: `.github/workflows/minimal-test.yml`
+- **To test locally:**
+  ```sh
+  cd minimal-test
+  npm install
+  npm test
+  ```
+- **To test via CI:**
+  - Push changes to `minimal-test/` or to the workflow file.
+  - The workflow will run automatically on GitHub Actions for `main` and `develop` branches.
+
+### 2. **deploy-gh-page/**
+
+- Contains static HTML files for deployment.
+- Workflow: `.github/workflows/deploy-github-page.yml`
+- **To test locally:**
+  - Open `deploy-gh-page/index.html` in your browser.
+- **To deploy via CI:**
+  - Push changes to `deploy-gh-page/` or to the workflow file.
+  - The workflow will build and deploy the site to GitHub Pages.
+
+### 3. **hello-world/**
+
+- Simple directory for workflow demonstration.
+- Workflow: `.github/workflows/hello-world.yml`
+- **To test via CI:**
+  - Push changes to `hello-world/` or to the workflow file.
+  - The workflow will run a simple echo command on GitHub Actions.
+
+---
+
+## Setting Up GitHub Rulesets (Branch Protection)
+
+To ensure code quality and prevent broken code from being merged, follow these steps to configure rulesets in your repository:
+
+### **Step-by-Step Guide:**
+
+1. **Go to your repository on GitHub.**
+2. **Navigate to:** `Settings` → `Code and automation` → `Rules` → `Rulesets`.
+3. **Click `New ruleset` or edit an existing one.**
+4. **Set the Ruleset Name:**
+   - Example: `branch-protection` or `main-branch-protection`.
+5. **Target Branches:**
+   - Choose `main` (recommended) or any branches you want to protect.
+6. **Enforcement Status:**
+   - Set to `Active` to enforce the rules.
+7. **Require status checks to pass:**
+   - Enable this option.
+   - Click `Add checks` and select the relevant status checks (e.g., `minimal-test`, `deploy-github-page`, etc.).
+8. **(Recommended) Require a pull request before merging:**
+   - Ensures all changes go through a PR and CI before merging.
+9. **Block force pushes and restrict deletions:**
+   - Enable for extra safety.
+10. **Save the ruleset.**
+
+**Result:** Now, any push or merge to the protected branch will require all status checks to pass before being accepted.
+
+---
+
+## Example: How to Intentionally Fail a Status Check
+
+Suppose you want to verify that your CI/CD pipeline blocks broken code. You can intentionally break a test in `minimal-test/`:
+
+**Edit `minimal-test/index.js`:**
+
+```js
+// Original sum function
+function sum(a, b) {
+  return a + b;
+}
+module.exports = sum;
+```
+
+**Change it to:**
+
+```js
+// Intentionally broken sum function
+function sum(a, b) {
+  return a - b; // This will cause the test to fail
+}
+module.exports = sum;
+```
+
+**Commit and push the change:**
+
+```sh
+git add minimal-test/index.js
+git commit -m "Update sum function to intentionally fail the check"
+git push origin <your-branch>
+```
+
+**Expected result:**
+
+- The GitHub Actions workflow for `minimal-test` will fail.
+- If you have branch protection rules, you will not be able to merge this change until the test passes.
+
+---
+
+## Troubleshooting
+
+- **Cannot push to protected branch:**
+  - Make sure you are pushing to a branch that is not protected, or create a Pull Request for merging.
+- **Status check is expected but not running:**
+  - Ensure your workflow YAML files include all relevant branches in the `on.push.branches` section.
+- **Workflow not appearing in status checks:**
+  - The status check name must match the job name in your workflow YAML.
+
+---
+
+## Important Clarification: Branch Protection, Status Checks, and Workflow Triggers
+
+If your `main` branch is protected by a ruleset that requires a status check, and your workflow is only triggered by `on: push` to `main`, **you will not be able to push directly to `main`** (as the check cannot run before the push is accepted).
+
+Additionally, if you want to create a pull request from `develop` to `main` and require status checks to pass, you must include `develop` in the workflow trigger (e.g., `on: push` branches: `main` and `develop`).
+
+Otherwise, the status check will remain pending on the PR, because the workflow will not run for changes in `develop`.
 
 ---
